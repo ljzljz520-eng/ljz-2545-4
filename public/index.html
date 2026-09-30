@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>夜架 NIGHT SHELF｜独立书店地图</title>
+  <meta name="description" content="按书架主题、座位与活动寻找独立书店，服务端计算真实营业实例。" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="paper-grain" aria-hidden="true"></div>
+  <header class="hero">
+    <nav class="nav shell">
+      <a class="brand" href="/" aria-label="夜架首页">
+        <span class="brand-mark" aria-hidden="true">▰▰▱</span>
+        <span><b>夜架</b><small>NIGHT SHELF</small></span>
+      </a>
+      <div class="nav-actions">
+        <a class="ghost-link" href="/export">导出 CSV</a>
+        <a class="ghost-link" href="#booking-check">查回执</a>
+      </div>
+    </nav>
+    <div class="shell hero-grid">
+      <section class="hero-copy">
+        <p class="eyebrow">SERVER-CALCULATED HOURS · DST SAFE</p>
+        <h1>找到今夜仍亮着灯的<br><span>独立书店</span></h1>
+        <p class="lede">书架主题、座位类型、活动场次和服务端营业实例一起筛选。跨午夜、临时闭店和闭店私场都有明确边界。</p>
+        <div class="hero-rules">
+          <span>临时闭店优先</span><span>闭店专场显式授权</span><span>地图/列表同查询版</span>
+        </div>
+      </section>
+      <form id="search-form" class="search-card" autocomplete="off">
+        <div class="search-title">
+          <b>开始找店</b><small>服务端按门店时区计算</small>
+        </div>
+        <label>关键词
+          <input name="q" placeholder="店名、旧名、主题，例如：诗歌" />
+        </label>
+        <div class="form-row">
+          <label>城市<select name="city"><option value="">全部城市</option></select></label>
+          <label>书架主题<select name="theme"><option value="">全部主题</option></select></label>
+        </div>
+        <label>座位<select name="seat"><option value="">不限座位</option></select></label>
+        <div class="switch-row">
+          <label class="switch"><input type="checkbox" name="openOnly" /> 只看当前营业</label>
+          <label class="switch"><input type="checkbox" name="upcomingEvents" /> 近期有活动</label>
+        </div>
+        <button class="primary" type="submit">生成同一查询版</button>
+        <p class="query-meta" id="query-meta">尚未查询</p>
+      </form>
+    </div>
+  </header>
+
+  <main class="shell layout">
+    <section class="map-panel" aria-labelledby="map-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">SHARED QUERY VERSION</p><h2 id="map-title">书架星图</h2></div>
+        <div class="status-pill" id="server-status">等待查询</div>
+      </div>
+      <div id="offline-banner" class="offline-banner hidden" role="alert"></div>
+      <div class="map-frame">
+        <svg id="map" role="img" aria-label="独立书店聚合地图" viewBox="0 0 1000 560">
+          <defs>
+            <radialGradient id="mapGlow" cx="50%" cy="45%" r="70%">
+              <stop offset="0%" stop-color="#263d54" />
+              <stop offset="100%" stop-color="#111d2e" />
+            </radialGradient>
+            <filter id="pinShadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#06101b" flood-opacity=".55"/>
+            </filter>
+            <pattern id="contour" width="42" height="42" patternUnits="userSpaceOnUse">
+              <path d="M0 21 C 12 5, 30 37, 42 21" fill="none" stroke="#ffffff" stroke-opacity=".07"/>
+            </pattern>
+          </defs>
+          <rect width="1000" height="560" rx="28" fill="url(#mapGlow)" />
+          <rect width="1000" height="560" rx="28" fill="url(#contour)" />
+          <g id="map-routes">
+            <path d="M110 390 C260 210, 440 420, 620 190 S875 150, 940 270" />
+            <path d="M180 110 C350 250, 520 80, 760 310 S900 420, 960 360" />
+          </g>
+          <g id="cluster-layer"></g>
+        </svg>
+        <div class="map-legend">
+          <span><i class="dot open"></i>营业</span>
+          <span><i class="dot closed"></i>闭店</span>
+          <span><i class="cluster-dot"></i>聚合</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="list-panel" aria-labelledby="list-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">PAGINATED WITH SAME QUERY ID</p><h2 id="list-title">门店列表</h2></div>
+        <div class="pager" role="group" aria-label="分页">
+          <button id="prev-page" type="button">上一页</button>
+          <span id="page-label">1 / 1</span>
+          <button id="next-page" type="button">下一页</button>
+        </div>
+      </div>
+      <div id="store-list" class="store-list">
+        <div class="empty">输入条件后，地图聚合和列表分页将共用同一个 queryId。</div>
+      </div>
+    </section>
+
+    <section class="receipt-panel" id="booking-check" aria-labelledby="receipt-title">
+      <div class="section-heading"><div><p class="eyebrow">ACTUAL SESSION RECEIPT</p><h2 id="receipt-title">预约回执</h2></div></div>
+      <form id="receipt-form" class="receipt-form">
+        <input name="code" placeholder="输入 10 位回执码" required />
+        <button>查询</button>
+      </form>
+      <div id="receipt-result" class="receipt-result">回执将显示实际 UTC 场次、门店当地时间及闭店授权信息。</div>
+    </section>
+  </main>
+
+  <dialog id="store-dialog">
+    <article class="dialog-card" id="store-detail"></article>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <footer class="footer shell">
+    <span>夜架 NIGHT SHELF · 原创视觉：墨蓝夜空、书签灯与等高线星图</span>
+    <span>状态仅来自服务端门店时区；导出带有 as-of 时间戳。</span>
+  </footer>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

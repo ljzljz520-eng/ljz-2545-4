@@ -1,0 +1,19 @@
+{
+  "name": "night-shelf-bookstore-map",
+  "version": "1.0.0",
+  "description": "独立书店地图站：服务端营业实例、闭店专场授权、活动报名与同版地图/列表查询",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node src/seed.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.4.1"
+  }
+}
