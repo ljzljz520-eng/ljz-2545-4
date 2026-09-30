@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>书屿志 · 独立书店地图</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%237a4829'/%3E%3Cpath d='M14 16h10v34H14zm12 0h10v34H26zm12 3 10-3v34l-10 3z' fill='%23f7ead5'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23d65f46'/%3E%3C/svg%3E">
+</head>
+<body>
+  <div class="paper-grain"></div>
+  <header class="hero">
+    <nav class="nav-shell">
+      <a class="brand" href="#top" aria-label="书屿志首页">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><b></b></span>
+        <span><strong>书屿志</strong><small>BOOKBAR ATLAS</small></span>
+      </a>
+      <div class="nav-actions">
+        <a href="#mapPanel">地图</a>
+        <a href="#listPanel">书单</a>
+        <a href="#eventsPanel">活动</a>
+        <button id="adminToggle" class="ghost" type="button">店长台</button>
+      </div>
+    </nav>
+    <div class="hero-grid" id="top">
+      <section class="hero-copy">
+        <p class="eyebrow">按书架主题 · 座位 · 夜间活动寻找独立书店</p>
+        <h1>把城市的<span>亮灯书架</span><br>收成一张会呼吸的地图。</h1>
+        <p class="lede">营业状态由服务端按门店时区计算。跨午夜的阅读夜归属开场日；临时闭店压过常规时间；闭店时段活动必须获得店长显式授权。</p>
+        <div class="hero-badges" aria-label="服务端保证">
+          <span>DST 双场次</span><span>查询版一致</span><span>席位事务锁</span><span>回执快照</span>
+        </div>
+      </section>
+      <div class="bookshelf-sculpture" aria-hidden="true">
+        <div class="shelf-row r1"><i style="--c:#a44a3f;--h:74px"></i><i style="--c:#d99b42;--h:92px"></i><i style="--c:#315c63;--h:66px"></i><i style="--c:#efe0bd;--h:82px"></i><i style="--c:#8b3e49;--h:96px"></i></div>
+        <div class="shelf-board"></div>
+        <div class="shelf-row r2"><i style="--c:#426b50;--h:86px"></i><i style="--c:#c96f4a;--h:60px"></i><i style="--c:#27445f;--h:94px"></i><i style="--c:#d8bd76;--h:78px"></i><i style="--c:#7d4b36;--h:88px"></i></div>
+        <div class="shelf-board"></div>
+        <div class="lamp-orb"><span></span></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="filter-card" aria-labelledby="filterTitle">
+      <div class="section-heading">
+        <p class="eyebrow">SERVER-CALCULATED QUERY</p>
+        <h2 id="filterTitle">此刻想找什么样的书店？</h2>
+      </div>
+      <form id="searchForm" class="filters">
+        <label class="wide">关键词<input id="q" name="q" placeholder="店名 / 地址 / 主题，如：推理"></label>
+        <label>书架主题
+          <select id="theme" name="theme"><option value="">全部</option></select>
+        </label>
+        <label>最少座位<input id="minSeats" name="minSeats" type="number" min="1" max="200" placeholder="不限"></label>
+        <label>座位设施
+          <select id="seatFeature"><option value="">不限</option><option>插座</option><option>安静</option><option>夜景</option></select>
+        </label>
+        <label>活动关键词
+          <input id="eventTitle" placeholder="如：朗读 / 工作坊">
+        </label>
+        <div class="switch-row">
+          <label class="check"><input id="openNow" type="checkbox"> 只看营业中</label>
+          <label class="check"><input id="authorizedOnly" type="checkbox"> 仅已授权闭店专场</label>
+        </div>
+        <button class="primary" type="submit">生成查询版</button>
+      </form>
+      <div id="versionBar" class="version-bar muted">尚未生成查询。地图聚合与列表分页会共用同一个查询版。</div>
+      <div id="offlineBanner" class="offline-banner" hidden></div>
+    </section>
+
+    <section class="workspace">
+      <article class="panel map-panel" id="mapPanel">
+        <div class="panel-head">
+          <div><p class="eyebring">MAP CLUSTERS</p><h2>书架群岛</h2></div>
+          <div class="map-tools">
+            <button id="zoomOut" type="button">－</button><button id="zoomIn" type="button">＋</button>
+          </div>
+        </div>
+        <div class="map-wrap">
+          <svg id="mapSvg" viewBox="0 0 1000 520" role="img" aria-label="独立书店世界地图">
+            <defs>
+              <radialGradient id="seaGlow" cx="50%" cy="45%" r="70%"><stop offset="0%" stop-color="#254f5a"/><stop offset="100%" stop-color="#132d36"/></radialGradient>
+              <filter id="softShadow"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000" flood-opacity=".35"/></filter>
+            </defs>
+            <rect width="1000" height="520" rx="26" fill="url(#seaGlow)"></rect>
+            <path class="grid-lines" d="M125 0V520M250 0V520M375 0V520M500 0V520M625 0V520M750 0V520M875 0V520M0 130H1000M0 260H1000M0 390H1000"></path>
+            <g class="landmasses">
+              <path d="M75 105c65-55 178-64 272-25 49 20 90 14 127 48 35 32 22 72-22 86-65 20-88 86-157 74-77-13-149-29-198-80-24-25-38-68-22-103z"></path>
+              <path d="M445 105c44-33 138-39 207-8 80 36 152 22 222 64 50 30 69 83 27 118-43 37-113 20-160 54-31 22-62 17-83-12-31-42-94-19-134-55-42-38-79-106-79-161z"></path>
+              <path d="M246 330c35-19 72-9 88 21 17 32 7 68-19 98-18 21-48 12-60-15-18-38-29-78-9-104z"></path>
+              <path d="M805 355c28-13 62-2 77 22 15 25 4 56-26 68-27 11-54-4-63-29-10-27-7-50 12-61z"></path>
+            </g>
+            <g id="markers"></g>
+          </svg>
+          <div id="mapTip" class="map-tip">生成查询后，门店会像书脊上的灯标一样亮起。</div>
+        </div>
+      </article>
+
+      <article class="panel list-panel" id="listPanel">
+        <div class="panel-head">
+          <div><p class="eyebring">PAGED LIST</p><h2>门店列表</h2></div>
+          <a id="exportLink" class="ghost button-disabled" aria-disabled="true" href="#">导出 CSV</a>
+        </div>
+        <div id="storeList" class="store-list empty">列表将显示服务端冻结的状态与状态变更点，过期后不会冒充“当前”。</div>
+        <div class="pager"><button id="prevPage" type="button">上一页</button><span id="pageInfo">—</span><button id="nextPage" type="button">下一页</button></div>
+      </article>
+    </section>
+
+    <section class="panel events-panel" id="eventsPanel">
+      <div class="panel-head"><div><p class="eyebring">EXPLICIT AFTER-HOURS</p><h2>近期活动与报名</h2></div></div>
+      <div id="eventList" class="event-list">使用“活动关键词”生成查询，或在门店详情中查看活动。闭店专场未经授权会被明确拒绝。</div>
+    </section>
+
+    <section class="panel admin-panel" id="adminPanel" hidden>
+      <div class="panel-head"><div><p class="eyebring">MANAGER DESK</p><h2>店长台：手工更正传播</h2></div></div>
+      <div class="admin-grid">
+        <form id="tokenForm" class="admin-box"><h3>访问令牌</h3><input id="adminToken" placeholder="X-Admin-Token / Bearer"><button class="ghost">保存令牌</button><p>开发默认：dev-manager-token</p></form>
+        <form id="exceptionForm" class="admin-box"><h3>临时闭店 / 改营业</h3>
+          <select id="exceptionStore"></select><input id="exceptionDate" type="date"><select id="exceptionKind"><option value="closed">临时闭店</option><option value="modified">临时改营业</option></select>
+          <div class="two"><input id="exceptionStart" type="number" min="0" max="1439" placeholder="开始分钟"><input id="exceptionEnd" type="number" min="0" max="1439" placeholder="结束分钟，跨午夜可更小"></div>
+          <input id="exceptionReason" placeholder="原因"><button class="primary">写入并重算</button></form>
+        <form id="renameForm" class="admin-box"><h3>店铺更名</h3><select id="renameStore"></select><input id="newName" placeholder="新名称"><button class="ghost">更名并使旧查询失效</button></form>
+        <form id="mergeForm" class="admin-box"><h3>店铺合并</h3><select id="mergeSource"></select><select id="mergeTarget"></select><button class="ghost">合并门店</button><p>未来未报名活动转至存活店；历史回执保留实际店铺快照。</p></form>
+        <form id="authForm" class="admin-box"><h3>闭店专场授权</h3><input id="authEventId" placeholder="event id"><input id="authNote" placeholder="授权说明"><button class="primary">显式授权</button></form>
+        <button id="rebuildBtn" class="ghost admin-box" type="button">立即重算预生成时间窗</button>
+      </div>
+      <pre id="adminResult" class="admin-result"></pre>
+    </section>
+  </main>
+
+  <dialog id="storeDialog">
+    <button class="dialog-close" value="cancel" aria-label="关闭">×</button>
+    <div id="storeDetail"></div>
+  </dialog>
+  <dialog id="registerDialog">
+    <button class="dialog-close" value="cancel" aria-label="关闭">×</button>
+    <form id="registerForm" method="dialog">
+      <h3>报名活动</h3><p id="registerEventTitle"></p>
+      <input type="hidden" id="registerEventId"><label>姓名<input id="attendeeName" required></label>
+      <label>联系方式<input id="attendeeContact" placeholder="邮箱或电话"></label>
+      <label>席位数<input id="seats" type="number" min="1" max="20" value="1" required></label>
+      <button class="primary" type="submit">确认抢占席位</button>
+    </form>
+    <div id="receipt"></div>
+  </dialog>
+
+  <footer><p>书屿志 · 原创视觉：木质书架、海图与暖灯。所有时间在服务端转换为绝对 UTC 实例。</p><a href="/api/health">服务健康</a></footer>
+  <script src="/app.js"></script>
+</body>
+</html>

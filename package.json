@@ -1,0 +1,20 @@
+{
+  "name": "bookbar-atlas",
+  "version": "1.0.0",
+  "description": "独立书店地图站：按书架主题、座位与活动查找门店，服务端时区排程与报名。",
+  "type": "commonjs",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node -e \"require('./server')\"",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "sql.js": "^1.12.0"
+  },
+  "license": "MIT"
+}
